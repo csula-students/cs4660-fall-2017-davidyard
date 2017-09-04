@@ -23,7 +23,7 @@ class SimpleFile(object):
         with zero)
         """
         mean_array = self.numbers[line_number]
-        return sum(mean_array)/len(mean_array)
+        return sum(mean_array)/float(len(mean_array))
 
     def get_max(self, line_number):
         """
