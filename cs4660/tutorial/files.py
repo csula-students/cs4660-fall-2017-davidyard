@@ -49,4 +49,3 @@ class SimpleFile(object):
         """
         sum_array = self.numbers[line_number]
         return sum(sum_array)
-
