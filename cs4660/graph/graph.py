@@ -172,7 +172,7 @@ class AdjacencyMatrix(object):
         x = 0
         while x < len(list_of_neighbors):
             if list_of_neighbors[x] > 0:
-                neighbors_list.append(Node(x))
+                neighbors_list.append(self.nodes[x])
             x += 1
         return neighbors_list
 
