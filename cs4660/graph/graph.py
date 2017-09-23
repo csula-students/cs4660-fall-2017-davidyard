@@ -167,7 +167,7 @@ class AdjacencyMatrix(object):
         return self.adjacency_matrix[node_1.data][node_2.data] > 0
 
     def neighbors(self, node):
-        list_of_neighbors = self.adjacency_matrix[node.data]
+        list_of_neighbors = self.adjacency_matrix[self.nodes.index(node)]
         neighbors_list = []
         x = 0
         while x < len(list_of_neighbors):
@@ -188,10 +188,10 @@ class AdjacencyMatrix(object):
     def remove_node(self, node):
         if node in self.nodes:
             self.nodes = [x for x in self.nodes if x != node]
-            self.adjacency_matrix[node.data] = [0 for x in range(len(self.nodes))]
+            del self.adjacency_matrix[node.data]
             counter = 0
-            for x in self.adjacency_matrix:
-                self.remove_edge(Edge(Node(counter), node, x[node.data]))
+            while counter < len(self.nodes):
+                del self.adjacency_matrix[counter][node.data]
                 counter += 1
             
             return True
