@@ -94,32 +94,6 @@ class Edge(object):
     def __hash__(self):
         return hash((self.from_node, self.to_node, self.weight))
 
-class Tile(object):
-    """Node represents basic unit of graph"""
-    def __init__(self, x, y, symbol):
-        self.x = x
-        self.y = y
-        self.symbol = symbol
-
-    def __str__(self):
-        return 'Tile(x: {}, y: {}, symbol: {})'.format(self.x, self.y, self.symbol)
-    def __repr__(self):
-        return 'Tile(x: {}, y: {}, symbol: {})'.format(self.x, self.y, self.symbol)
-
-    def __eq__(self, other):
-        if isinstance(other, self.__class__):
-            return self.x == other.x and self.y == other.y and self.symbol == other.symbol
-        return False
-    def __lt__(self, other):
-        return self.x < other.x or self.y < other.y
-    def __gt__(self, other):
-        return self.x > other.x and self.y > other.y
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __hash__(self):
-        return hash(str(self.x) + "," + str(self.y) + self.symbol)
-
 class AdjacencyList(object):
     """
     AdjacencyList is one of the graph representation which uses adjacency list to
@@ -251,8 +225,8 @@ class AdjacencyMatrix(object):
             return True
 
     def remove_edge(self, edge):
-        if edge.weight == self.adjacency_matrix[edge.from_node.data][edge.to_node.data]:
-            self.adjacency_matrix[edge.from_node.data][edge.to_node.data] = 0
+        if edge.weight == self.adjacency_matrix[self.__get_node_index(edge.from_node)][self.__get_node_index(edge.to_node)]:
+            self.adjacency_matrix[self.__get_node_index(edge.from_node)][self.__get_node_index(edge.to_node)] = 0
             return True
         else:
             return False
