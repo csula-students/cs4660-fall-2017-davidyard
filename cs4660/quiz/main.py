@@ -106,6 +106,7 @@ def dijkstra(initial_node, dest_node):
     parent_list.update({initial_node['id']: "No Parent"})
     distance_list = {}
     parent_distance = 0
+    counter = 0
     distance_list.update({initial_node['id']: parent_distance})
     while not q.empty():
         node_from_q = q.get()[2]
@@ -114,16 +115,20 @@ def dijkstra(initial_node, dest_node):
         for node in node_from_q['neighbors']:
             if node['id'] not in visited:
                 parent_list.update({node['id']: node_from_q})
-                parent_distance = transition_state(empty_room['id'], empty_room['neighbors'][0]['id'])['event']['effect'] + distance_list[node_from_q['id']]
+                parent_distance = transition_state(node_from_q['id'], node['id'])['event']['effect'] + distance_list[node_from_q['id']]
                 distance_list.update({node['id']: parent_distance})
                 
                 if node['id'] == dest_node['id']:
                     #print("DESCUDH: ",dest_node['id'])
                     node_path.append(node)
+                    print(parent_distance)
                     while not q.empty():
                         q.get()
                 else:
-                    q.put((transition_state(empty_room['id'], empty_room['neighbors'][0]['id'])['event']['effect'], node['id'], node))
+                    priority = transition_state(node_from_q['id'], node['id'])['event']['effect']
+                    #print("priority: ",priority)
+                    q.put((-priority, counter, node))
+                    counter += 1
                     visited.append(node['id'])
                     #print(visited)
     for node in node_path:
