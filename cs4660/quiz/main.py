@@ -88,7 +88,6 @@ def bfs(initial_node, dest_node):
             actions.append(from_node + to_node + weight)
             #print("tonode\n", to_node)
 
-    #print("THE PATH IS: ",list(reversed(actions)))
     return list(reversed(actions))
 
 def dijkstra(initial_node, dest_node):
@@ -101,12 +100,13 @@ def dijkstra(initial_node, dest_node):
     q.put((0, initial_node['id'], initial_node))
     actions = []
     node_path = []
+    node_path.append(dest_node)
     visited = [initial_node['id']]
     parent_list = {} #set up so it is child: parent
-    parent_list.update({initial_node['id']: "No Parent"})
+    parent_list[initial_node['id']] = {'No Parent': 'No Parent'}
     distance_list = {}
     parent_distance = 0
-    counter = 0
+    hp = {}
     distance_list.update({initial_node['id']: parent_distance})
     while not q.empty():
         node_from_q = q.get()[2]
@@ -114,35 +114,44 @@ def dijkstra(initial_node, dest_node):
             node_from_q = get_state(node_from_q['id'])
         for node in node_from_q['neighbors']:
             if node['id'] not in visited:
-                parent_list.update({node['id']: node_from_q})
-                parent_distance = transition_state(node_from_q['id'], node['id'])['event']['effect'] + distance_list[node_from_q['id']]
-                distance_list.update({node['id']: parent_distance})
+                if node['id'] in parent_list:
+                    parent_list[node['id']].update({node_from_q['id']:node_from_q})
+                    #print("HERE")
+                else:
+                    parent_list[node['id']] = {node_from_q['id']: node_from_q}
+                    #print("BECKS")
+
+                if node_from_q['id'] == initial_node['id']:
+                    parent_distance = transition_state(node_from_q['id'], node['id'])['event']['effect']
+                    hp[(node_from_q['id'], node['id'])] = parent_distance
+                else:
+                    #print(list(parent_list[node_from_q['id']].values())[0])
+                    pounds = transition_state(node_from_q['id'], node['id'])['event']['effect']
+                    hp[(node_from_q['id'], node['id'])] = pounds
+                    parent_distance = pounds + distance_list[(list(parent_list[node_from_q['id']].keys())[0], node_from_q['id'])]
+                
+                distance_list.update({(node_from_q['id'], node['id']): parent_distance})
                 
                 if node['id'] == dest_node['id']:
-                    #print("DESCUDH: ",dest_node['id'])
-                    node_path.append(node)
-                    print(parent_distance)
-                    while not q.empty():
-                        q.get()
+                    continue
                 else:
-                    priority = transition_state(node_from_q['id'], node['id'])['event']['effect']
                     #print("priority: ",priority)
-                    q.put((-priority, counter, node))
-                    counter += 1
+                    q.put((-parent_distance, node['id'], node))
                     visited.append(node['id'])
-                    #print(visited)
+                    #print("ELDS|")
     for node in node_path:
-        if str(parent_list[node['id']]) == "No Parent":
+        if str(list(parent_list[node['id']].values())[0]) == "No Parent":
             break
         else:
-            node_path.append(parent_list[node['id']])
-            from_node = parent_list[node['id']]['location']['name'] + " (" + parent_list[node['id']]['id']+") "
+            #print("JSKFH", list(parent_list[node['id']].values())[0]['id'])
+            node_path.append(list(parent_list[node['id']].values())[0])
+            from_node = list(parent_list[node['id']].values())[0]['location']['name'] + " (" + list(parent_list[node['id']].values())[0]['id']+") "
             to_node = node['location']['name'] + " (" + node['id']+") "
-            weight = ": " + str(transition_state(parent_list[node['id']]['id'], node['id'])['event']['effect'])
+            weight = ": " + str(hp[list(parent_list[node['id']].values())[0]['id'], node['id']])
             actions.append(from_node + to_node + weight)
             #print("tonode\n", to_node)
-
-    #print("THE PATH IS: ",list(reversed(actions)))
+    #print(node_path)
+    print("THE Total HP for Dijkstra is: ",distance_list[(list(parent_list['f1f131f647621a4be7c71292e79613f9'].keys())[0], 'f1f131f647621a4be7c71292e79613f9')])
     return list(reversed(actions))
 
 def __json_request(target_url, body):
