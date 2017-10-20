@@ -160,35 +160,41 @@ def a_star_search(graph, initial_node, dest_node):
     returns a list of actions going from the initial node to dest_node
     """
     q = PriorityQueue(maxsize=0)
-    q.put(initial_node, 0)
+    q.put((0, initial_node))
     edges = []
+    node_path = []
+    node_path.append(dest_node)
     came_from = {}
     cost_so_far = {}
     came_from[initial_node] = 'No Parent'
     cost_so_far[initial_node] = 0
-    print("REACHED HERE\n")
+    node_path
+    #print("REACHED HERE\n")
     while not q.empty():
-        current = q.get()
+        current = q.get()[1]
         if current == dest_node:
             break
-        for next in graph.neighbors(current):
-            new_cost = cost_so_far[current] + graph.distance(current, next)
-            if next not in cost_so_far or new_cost < cost_so_far[next]:
-                cost_so_far[next] = new_cost
-                x_axis = abs(dest_node.data.x - next.data.x)
-                y_axis = abs(dest_node.data.y - next.data.y)
+        for node in graph.neighbors(current):
+            new_cost = cost_so_far[current] + graph.distance(current, node)
+            if node not in cost_so_far or new_cost < cost_so_far[node]:
+                #if new_cost < cost_so_far[current]:
+                cost_so_far[node] = new_cost
+                x_axis = abs(dest_node.data.x - node.data.x)
+                y_axis = abs(dest_node.data.y - node.data.y)
                 heuristic = x_axis + y_axis
                 priority = new_cost + heuristic
-                q.put(next, priority)
-                came_from[next] = current
+                
+                q.put((priority, node))
+                came_from[node] = current
 
-    for to_node in came_from.keys():
+    for to_node in node_path:
         from_node = came_from[to_node]
         if str(from_node) == 'No Parent':
             continue
         else:
+            node_path.append(from_node)
             edge = Edge(from_node, to_node, 1)
             #print(edge)
             edges.append(edge)
 
-    return edges
+    return list(reversed(edges))

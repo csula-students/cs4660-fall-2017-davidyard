@@ -178,7 +178,7 @@ class AdjacencyMatrix(object):
         self.nodes = []
 
     def adjacent(self, node_1, node_2):
-        return self.adjacency_matrix[node_1.data][node_2.data] > 0
+        return self.adjacency_matrix[self.__get_node_index(node_1)][self.__get_node_index(node_2)] > 0
 
     def neighbors(self, node):
         list_of_neighbors = self.adjacency_matrix[self.nodes.index(node)]
@@ -235,7 +235,7 @@ class AdjacencyMatrix(object):
 
     def distance(self, node_1, node_2):
         if self.adjacent(node_1, node_2):
-            return self.adjacency_matrix[node_1.data][node_2.data]
+            return self.adjacency_matrix[self.__get_node_index(node_1)][self.__get_node_index(node_2)]
         else:
             return "There is no edge from node "+str(node_1)+" to node "+str(node_2)
 
