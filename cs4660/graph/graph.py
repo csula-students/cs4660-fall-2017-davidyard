@@ -1,8 +1,6 @@
 """
 graph module defines the knowledge representations files
-
 A Graph has following methods:
-
 * adjacent(node_1, node_2)
     - returns True if node_1 and node_2 are directly connected or False otherwise
 * neighbors(node)
@@ -23,15 +21,13 @@ A Graph has following methods:
 
 from io import open
 from operator import itemgetter
+#from graph.utils import Tile
 
 def construct_graph_from_file(graph, file_path):
     """
     TODO: read content from file_path, then add nodes and edges to graph object
-
     note that grpah object will be either of AdjacencyList, AdjacencyMatrix or ObjectOriented
-
     In example, you will need to do something similar to following:
-
     1. add number of nodes to graph first (first line)
     2. for each following line (from second line to last line), add them as edge to graph
     3. return the graph
@@ -64,6 +60,10 @@ class Node(object):
 
     def __eq__(self, other_node):
         return self.data == other_node.data
+    def __lt__(self, other_node):
+        return self.data < other_node.data    
+    def __gt__(self, other_node):
+        return self.data > other_node.data
     def __ne__(self, other):
         return not self.__eq__(other)
 
@@ -88,7 +88,6 @@ class Edge(object):
 
     def __hash__(self):
         return hash((self.from_node, self.to_node, self.weight))
-
 
 class AdjacencyList(object):
     """
@@ -154,6 +153,21 @@ class AdjacencyList(object):
         else:
             return False
 
+    def distance(self, node_1, node_2):
+        if self.adjacent(node_1, node_2):
+            edges = self.adjacency_list[node_1]
+            for edge in edges:
+                if edge.to_node == node_2:
+                    return edge.weight
+        else:
+            return "There is no edge from node "+str(node_1)+" to node "+str(node_2)
+
+    def total_number_of_nodes(self):
+        return len(self.adjacency_list)
+
+    def list_of_nodes(self):
+        return list(self.adjacency_list.keys())
+
 class AdjacencyMatrix(object):
     def __init__(self):
         # adjacency_matrix should be a two dimensions array of numbers that
@@ -164,7 +178,7 @@ class AdjacencyMatrix(object):
         self.nodes = []
 
     def adjacent(self, node_1, node_2):
-        return self.adjacency_matrix[node_1.data][node_2.data] > 0
+        return self.adjacency_matrix[self.__get_node_index(node_1)][self.__get_node_index(node_2)] > 0
 
     def neighbors(self, node):
         list_of_neighbors = self.adjacency_matrix[self.nodes.index(node)]
@@ -199,15 +213,15 @@ class AdjacencyMatrix(object):
             return False
 
     def add_edge(self, edge):
-        if edge.weight == self.adjacency_matrix[edge.from_node.data][edge.to_node.data]:
+        if edge.weight == self.adjacency_matrix[self.__get_node_index(edge.from_node)][self.__get_node_index(edge.to_node)]:
             return False
         else:
-            self.adjacency_matrix[edge.from_node.data][edge.to_node.data] = edge.weight
+            self.adjacency_matrix[self.__get_node_index(edge.from_node)][self.__get_node_index(edge.to_node)] = edge.weight
             return True
 
     def remove_edge(self, edge):
-        if edge.weight == self.adjacency_matrix[edge.from_node.data][edge.to_node.data]:
-            self.adjacency_matrix[edge.from_node.data][edge.to_node.data] = 0
+        if edge.weight == self.adjacency_matrix[self.__get_node_index(edge.from_node)][self.__get_node_index(edge.to_node)]:
+            self.adjacency_matrix[self.__get_node_index(edge.from_node)][self.__get_node_index(edge.to_node)] = 0
             return True
         else:
             return False
@@ -219,6 +233,17 @@ class AdjacencyMatrix(object):
         else:
             return -1
 
+    def distance(self, node_1, node_2):
+        if self.adjacent(node_1, node_2):
+            return self.adjacency_matrix[self.__get_node_index(node_1)][self.__get_node_index(node_2)]
+        else:
+            return "There is no edge from node "+str(node_1)+" to node "+str(node_2)
+
+    def total_number_of_nodes(self):
+        return len(self.nodes)
+
+    def list_of_nodes(self):
+        return self.nodes
 
 class ObjectOriented(object):
     """ObjectOriented defines the edges and nodes as both list"""
@@ -273,3 +298,17 @@ class ObjectOriented(object):
         else:
             return False 
 
+    def distance(self, node_1, node_2):
+        if self.adjacent(node_1, node_2):
+            for edge in self.edges:
+                if edge.from_node == node_1 and edge.to_node == node_2:
+                    return edge.weight
+
+        else:
+            return "There is no edge from node "+str(node_1)+" to node "+str(node_2)
+
+    def total_number_of_nodes(self):
+        return len(self.nodes)
+
+    def list_of_nodes(self):
+        return self.nodes
